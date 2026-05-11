@@ -1,36 +1,90 @@
 import torch
+import torch.nn as nn
+import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, random_split
 
+# Import the architecture from model.py file
+from model import TrashClassifierCNN
+
+# Define transforms
 data_transforms = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor()         
 ])
 
-# Load the entire folder of images
-# ImageFolder automatically reads subfolder names and turns them into labels
+# Load dataset
 dataset_path = 'dataset'
 full_dataset = datasets.ImageFolder(root=dataset_path, transform=data_transforms)
 
-# Split the data: 80% Training and 20% Testing
+# Split data
 train_size = int(0.8 * len(full_dataset))
 test_size = len(full_dataset) - train_size
 
-train_dataset, test_dataset = random_split(
-    full_dataset, 
-    [train_size, test_size]
-)
+train_dataset, test_dataset = random_split(full_dataset, [train_size, test_size])
 
-# Create data loaders 
+# Create DataLoaders
 train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
+def train_model():
+    # Check if Apple Silicon GPU (MPS) is available, otherwise use CPU
+    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    print(f"Using device: {device}")
+
+    # Initialize the model and send it to the device (GPU/CPU)
+    num_classes = len(full_dataset.classes)
+    model = TrashClassifierCNN(num_classes=num_classes).to(device)
+
+    # Define the Loss function and Optimizer
+    # CrossEntropyLoss is the standard for classification problems
+    criterion = nn.CrossEntropyLoss()
+    # Adam is a very popular and efficient optimizer
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+    # Number of times we go through the entire dataset
+    num_epochs = 10
+
+    print("Starting training loop...")
+    print("-" * 30)
+
+    # Training loop
+    for epoch in range(num_epochs):
+        model.train() # Set model to training mode 
+        running_loss = 0.0
+
+        for batch_idx, (images, labels) in enumerate(train_loader):
+            # Move data to the same device as the model (MPS/CPU)
+            images, labels = images.to(device), labels.to(device)
+
+            # Clear old gradients
+            optimizer.zero_grad()
+            
+            # Forward pass (make a prediction)
+            outputs = model(images)
+            
+            # Calculate loss (how wrong the prediction was)
+            loss = criterion(outputs, labels)
+            
+            # Backward pass (calculate corrections)
+            loss.backward()
+            
+            # Optimizer step (apply corrections)
+            optimizer.step()
+
+            running_loss += loss.item()
+
+        # Print progress at the end of each epoch
+        average_loss = running_loss / len(train_loader)
+        print(f"Epoch [{epoch+1}/{num_epochs}] completed | Average Loss: {average_loss:.4f}")
+
+    print("-" * 30)
+    print("Training finished!")
+
+    # We save the trained model so predict.py can use it later
+    save_path = 'model.pt'
+    torch.save(model.state_dict(), save_path)
+    print(f"Model saved successfully to {save_path}")
+
 if __name__ == "__main__":
-    print(f"Found the following trash categories: {full_dataset.classes}")
-    print(f"Total images found: {len(full_dataset)}")
-    print(f"Images reserved for training: {len(train_dataset)}")
-    print(f"Images reserved for testing: {len(test_dataset)}")
-    
-    # Take a single batch of 32 images to verify its mathematical shape
-    images, labels = next(iter(train_loader))
-    print(f"Shape of a single image batch: {images.shape}")
+    train_model()
