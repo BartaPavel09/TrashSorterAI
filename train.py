@@ -43,7 +43,7 @@ def train_model():
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # Number of times we go through the entire dataset
-    num_epochs = 10
+    num_epochs = 50
 
     print("Starting training loop...")
     print("-" * 30)
