@@ -1,4 +1,4 @@
-# TrashNet Classification AI Project
+# TrashSorterAI
 
 This project implements a Convolutional Neural Network (CNN) built from scratch using PyTorch. It is designed to classify images of waste into 6 specific categories (cardboard, glass, metal, paper, plastic, trash) to automate recycling sorting.
 
