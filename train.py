@@ -28,8 +28,8 @@ train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
 def train_model():
-    # Check if Apple Silicon GPU (MPS) is available, otherwise use CPU
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+    # Check for NVIDIA GPU (Windows/Linux), then Apple Silicon (Mac), otherwise fallback to CPU
+    device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
     print(f"Using device: {device}")
 
     # Initialize the model and send it to the device (GPU/CPU)
