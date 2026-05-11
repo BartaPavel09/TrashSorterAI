@@ -16,11 +16,23 @@ After downloading, extract the archive and ensure the images are placed in a fol
   - `trash/`
 
 ## 2. Environment Setup
-To run this project, you need Python installed. It is recommended to use a virtual environment.
+To run this project, you need Python installed. It is strictly recommended to use a virtual environment.
 
-1. Open a terminal in the project directory.
-2. Install the required dependencies by running:
-   `pip install -r requirements.txt`
+**1: Create the virtual environment**
+Open a terminal in the project directory and run:
+`python -m venv .venv`
+
+**2: Activate the virtual environment**
+- **On Windows (Command Prompt):**
+  `.venv\Scripts\activate.bat`
+- **On Windows (PowerShell):**
+  `.\.venv\Scripts\Activate.ps1`
+- **On macOS and Linux:**
+  `source .venv/bin/activate`
+
+**3: Install the required dependencies**
+Once the environment is active (you should see `(.venv)` in your terminal prompt), install the packages by running:
+`pip install -r requirements.txt`
 
 ## 3. Project Structure
 - `model.py`: Contains the CNN architecture (built from scratch).
