@@ -15,7 +15,7 @@ data_transforms = transforms.Compose([
 
 # Load dataset
 dataset_path = 'dataset'
-full_dataset = datasets.ImageFolder(root=dataset_path, transform=data_transforms)
+full_dataset = datasets.ImageFolder(root=dataset_path, transform=data_transforms) # It deduces automatically the class labels from the folder names and puts number labels in the dataset
 
 # Split data
 train_size = int(0.8 * len(full_dataset))
@@ -37,7 +37,6 @@ def train_model():
     model = TrashClassifierCNN(num_classes=num_classes).to(device)
 
     # Define the Loss function and Optimizer
-    # CrossEntropyLoss is the standard for classification problems
     criterion = nn.CrossEntropyLoss()
     # Adam is a very popular and efficient optimizer
     optimizer = optim.Adam(model.parameters(), lr=0.001)
